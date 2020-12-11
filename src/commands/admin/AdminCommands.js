@@ -358,11 +358,12 @@ class MuteCommand extends AdminCommand {
             if (member.hasPermission('ADMINISTRATOR')) {
                 throw new Error('Cannot mute admins');
             }
-            if (await Database_1.Mutes.findOne({ where: { id: member.id } })) {
+            if (await Database_1.Mutes.findOne({ where: { id: member.user.id } })) {
                 throw new Error(`<@${member.user.id}> was muted already`);
             }
             member.roles.add('785839177022963731');
             const mute = {
+                id: member.user.id,
                 tag: member.user.tag,
                 duration: durationValue,
                 reason: reason,
@@ -371,6 +372,7 @@ class MuteCommand extends AdminCommand {
             await Database_1.Mutes.create(mute);
         }
         catch (err) {
+            console.error(err);
             return msg.say(`Failed to mute member: ${err.message}`);
         }
         return msg.say(`Successfully muted <@${member.user.id}> for ${timeUnit === 's'
@@ -422,10 +424,12 @@ class UnmuteCommand extends AdminCommand {
 }
 exports.UnmuteCommand = UnmuteCommand;
 function getReason(msg, reason, shiftAmount) {
-    const contentArr = msg.content.split(' ');
+    const contentArr = msg.content.split(' ').filter(e => e);
+    console.log('contentArr', contentArr);
+    console.log('contentArr\n\n', contentArr);
     shiftAmount = shiftAmount || 2;
     let i = 0;
-    while (i <= shiftAmount) {
+    while (i < shiftAmount) {
         contentArr.shift();
         i++;
     }

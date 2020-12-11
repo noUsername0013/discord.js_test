@@ -383,12 +383,13 @@ export class MuteCommand extends AdminCommand {
             if ((member as GuildMember).hasPermission('ADMINISTRATOR')) {
                 throw new Error('Cannot mute admins');
             }
-            if (await Mutes.findOne({ where: { id: member.id } })) {
+            if (await Mutes.findOne({ where: { id: member.user.id } })) {
                 throw new Error(`<@${member.user.id}> was muted already`);
             }
             (member as GuildMember).roles.add('785839177022963731');
 
             const mute = {
+                id:member.user.id,
                 tag: member.user.tag,
                 duration: durationValue,
                 reason: reason,
@@ -396,6 +397,7 @@ export class MuteCommand extends AdminCommand {
             };
             await Mutes.create(mute);
         } catch (err) {
+            console.error(err)
             return msg.say(`Failed to mute member: ${err.message}`);
         }
         return msg.say(
@@ -455,10 +457,12 @@ export class UnmuteCommand extends AdminCommand {
 }
 
 function getReason(msg: CommandoMessage, reason: any, shiftAmount?: number) {
-    const contentArr = msg.content.split(' ');
+    const contentArr = msg.content.split(' ').filter(e => e);
+    console.log('contentArr',contentArr)
+    console.log('contentArr\n\n',contentArr)
     shiftAmount = shiftAmount || 2;
     let i = 0;
-    while (i <= shiftAmount) {
+    while (i < shiftAmount) {
         contentArr.shift();
         i++;
     }

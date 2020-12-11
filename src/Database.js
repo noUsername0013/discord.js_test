@@ -5,6 +5,7 @@ const sequelize_1 = require("sequelize");
 const seq = new sequelize_1.Sequelize({
     dialect: 'sqlite',
     storage: './.database.sqlite',
+    logging: false
 });
 class Users extends sequelize_1.Model {
 }
@@ -33,6 +34,12 @@ Mutes.init({
         type: sequelize_1.DataTypes.STRING,
         allowNull: false,
         primaryKey: true,
+    },
+    tag: {
+        type: sequelize_1.DataTypes.STRING
+    },
+    duration: {
+        type: sequelize_1.DataTypes.FLOAT
     },
     reason: {
         type: sequelize_1.DataTypes.STRING,

@@ -93,36 +93,36 @@ client.on('message', (msg) => onMessage(msg));
 
 client.on('guildMemberAdd', (member) => welcome(member));
 
-const emitter = new events.EventEmitter();
-function timer() {
-    setTimeout(() => {
-        emitter.emit('event1');
-        console.log('checking mutes...');
-        const mutes = JSON.parse(
-            fs.readFileSync('./users/mutes.json', 'utf-8')
-        );
-        const currentTime = Date.now();
-        for (const key in mutes) {
-            const expireTime = mutes[key].expireDate;
-            if (expireTime < currentTime) {
-                delete mutes[key];
-                console.log('deleted mute of ' + key);
-                client.channels
-                    .fetch('781162983274971186')
-                    .then((ch) =>
-                        (ch as any).send(`<@${key}>'s mute has expired`)
-                    );
-                client.guilds
-                    .fetch('775699083108024331')
-                    .then((g) =>
-                        g.members
-                            .fetch(key)
-                            .then((m) => m.roles.remove('785839177022963731'))
-                    );
-            }
-        }
-        fs.writeFileSync('./users/mutes.json', JSON.stringify(mutes));
-    }, 60000);
-}
-emitter.on('event1', timer);
-emitter.emit('event1');
+// const emitter = new events.EventEmitter();
+// function timer() {
+//     setTimeout(() => {
+//         emitter.emit('event1');
+//         console.log('checking mutes...');
+//         const mutes = JSON.parse(
+//             fs.readFileSync('./users/mutes.json', 'utf-8')
+//         );
+//         const currentTime = Date.now();
+//         for (const key in mutes) {
+//             const expireTime = mutes[key].expireDate;
+//             if (expireTime < currentTime) {
+//                 delete mutes[key];
+//                 console.log('deleted mute of ' + key);
+//                 client.channels
+//                     .fetch('781162983274971186')
+//                     .then((ch) =>
+//                         (ch as any).send(`<@${key}>'s mute has expired`)
+//                     );
+//                 client.guilds
+//                     .fetch('775699083108024331')
+//                     .then((g) =>
+//                         g.members
+//                             .fetch(key)
+//                             .then((m) => m.roles.remove('785839177022963731'))
+//                     );
+//             }
+//         }
+//         fs.writeFileSync('./users/mutes.json', JSON.stringify(mutes));
+//     }, 60000);
+// }
+// emitter.on('event1', timer);
+// emitter.emit('event1');
