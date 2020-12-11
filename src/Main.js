@@ -2,11 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.client = void 0;
 const Discord = require("discord.js");
-const fs = require("fs");
 const botconfig_json_1 = require("../botconfig.json");
 const discord_js_commando_1 = require("discord.js-commando");
 const path_1 = require("path");
 const Database_1 = require("./Database");
+const dotenv_1 = require("dotenv");
+dotenv_1.config();
 const client = new discord_js_commando_1.CommandoClient({
     commandPrefix: botconfig_json_1.commandOptions.prefix,
     owner: '488709903737815040',
@@ -22,13 +23,6 @@ client.registry
     .registerDefaultCommands()
     .registerCommandsIn(path_1.join(__dirname, 'commands/public'))
     .registerCommandsIn(path_1.join(__dirname, 'commands/admin'));
-if (!fs.existsSync('./users/users.json')) {
-    console.log('users.json does not exist, creating one');
-    if (!fs.existsSync('./users')) {
-        fs.mkdirSync('./users');
-    }
-    fs.writeFileSync('./users/users.json', '{}', { encoding: 'utf-8' });
-}
 async function handleExp(msg) {
     //喵喵經驗值?
     const author = msg.author.id;
@@ -77,7 +71,7 @@ function welcome(member) {
     member.guild.roles.add(role);
     console.log(`member ${member.user.username} joined`);
 }
-client.login(fs.readFileSync('./.token.txt', 'utf-8'));
+client.login(process.env.TOKEN);
 client.once('ready', () => {
     console.log('ready', client.user.tag);
 });

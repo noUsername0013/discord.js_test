@@ -424,7 +424,7 @@ class UnmuteCommand extends AdminCommand {
 }
 exports.UnmuteCommand = UnmuteCommand;
 function getReason(msg, reason, shiftAmount) {
-    const contentArr = msg.content.split(' ').filter(e => e);
+    const contentArr = msg.content.split(' ').filter((e) => e);
     console.log('contentArr', contentArr);
     console.log('contentArr\n\n', contentArr);
     shiftAmount = shiftAmount || 2;

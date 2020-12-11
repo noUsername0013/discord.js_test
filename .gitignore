@@ -111,3 +111,6 @@ dist
 
 #vscode
 .vscode/
+
+#compiled js
+src/*.js
