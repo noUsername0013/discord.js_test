@@ -108,3 +108,6 @@ dist
 
 #bot database
 .database.sqlite
+
+#vscode
+.vscode/

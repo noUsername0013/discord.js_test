@@ -1,5 +1,4 @@
 import { commandOptions } from '../../../botconfig.json';
-import * as Utils from '../../utils';
 import {
     Command,
     CommandInfo,

@@ -4,7 +4,7 @@ exports.Users = void 0;
 const sequelize_1 = require("sequelize");
 const seq = new sequelize_1.Sequelize({
     dialect: 'sqlite',
-    storage: './database.sqlite',
+    storage: './.database.sqlite',
 });
 class Users extends sequelize_1.Model {
 }

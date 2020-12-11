@@ -78,7 +78,7 @@ function welcome(member) {
     member.guild.roles.add(role);
     console.log(`member ${member.user.username} joined`);
 }
-client.login(fs.readFileSync('./token.txt', 'utf-8'));
+client.login(fs.readFileSync('./.token.txt', 'utf-8'));
 client.once('ready', () => {
     console.log('ready', client.user.tag);
 });
