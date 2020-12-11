@@ -48,4 +48,4 @@ Mutes.init(
 );
 Users.sync();
 Mutes.sync();
-export { Users };
+export { Users, Mutes };
