@@ -5,7 +5,6 @@ import {
     CommandoClient,
     CommandoMessage,
 } from 'discord.js-commando';
-import { readFileSync, writeFileSync } from 'fs';
 import { GuildMember } from 'discord.js';
 import { Users, Mutes } from '../../Database';
 const aliases = commandOptions.aliases;
@@ -389,7 +388,7 @@ export class MuteCommand extends AdminCommand {
             (member as GuildMember).roles.add('785839177022963731');
 
             const mute = {
-                id:member.user.id,
+                id: member.user.id,
                 tag: member.user.tag,
                 duration: durationValue,
                 reason: reason,
@@ -397,7 +396,7 @@ export class MuteCommand extends AdminCommand {
             };
             await Mutes.create(mute);
         } catch (err) {
-            console.error(err)
+            console.error(err);
             return msg.say(`Failed to mute member: ${err.message}`);
         }
         return msg.say(
@@ -457,9 +456,9 @@ export class UnmuteCommand extends AdminCommand {
 }
 
 function getReason(msg: CommandoMessage, reason: any, shiftAmount?: number) {
-    const contentArr = msg.content.split(' ').filter(e => e);
-    console.log('contentArr',contentArr)
-    console.log('contentArr\n\n',contentArr)
+    const contentArr = msg.content.split(' ').filter((e) => e);
+    console.log('contentArr', contentArr);
+    console.log('contentArr\n\n', contentArr);
     shiftAmount = shiftAmount || 2;
     let i = 0;
     while (i < shiftAmount) {

@@ -3,7 +3,7 @@ import { Sequelize, Model, DataTypes } from 'sequelize';
 const seq = new Sequelize({
     dialect: 'sqlite',
     storage: './.database.sqlite',
-    logging: false
+    logging: false,
 });
 
 class Users extends Model {}
@@ -35,11 +35,11 @@ Mutes.init(
             allowNull: false,
             primaryKey: true,
         },
-        tag:{
-            type:DataTypes.STRING
+        tag: {
+            type: DataTypes.STRING,
         },
-        duration:{
-            type:DataTypes.FLOAT
+        duration: {
+            type: DataTypes.FLOAT,
         },
         reason: {
             type: DataTypes.STRING,
