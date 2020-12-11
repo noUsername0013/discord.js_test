@@ -7,7 +7,7 @@ import {
 } from 'discord.js-commando';
 import { readFileSync, writeFileSync } from 'fs';
 import { GuildMember } from 'discord.js';
-import { Users } from '../../Database';
+import { Users, Mutes } from '../../Database';
 const aliases = commandOptions.aliases;
 
 class AdminCommand extends Command {
@@ -381,23 +381,20 @@ export class MuteCommand extends AdminCommand {
 
         try {
             if ((member as GuildMember).hasPermission('ADMINISTRATOR')) {
-                //throw new Error('Cannot mute admins');
+                throw new Error('Cannot mute admins');
             }
-            const mutes = JSON.parse(
-                readFileSync('./users/mutes.json', 'utf-8')
-            );
-            if (mutes[member.user.id]) {
+            if (await Mutes.findOne({ where: { id: member.id } })) {
                 throw new Error(`<@${member.user.id}> was muted already`);
             }
             (member as GuildMember).roles.add('785839177022963731');
 
-            mutes[member.id] = {
+            const mute = {
                 tag: member.user.tag,
                 duration: durationValue,
                 reason: reason,
                 expireDate: Date.parse(expireDate.toUTCString()),
             };
-            writeFileSync('./users/mutes.json', JSON.stringify(mutes));
+            await Mutes.create(mute);
         } catch (err) {
             return msg.say(`Failed to mute member: ${err.message}`);
         }
@@ -438,7 +435,7 @@ export class UnmuteCommand extends AdminCommand {
             ],
         });
     }
-    run(msg: CommandoMessage, { member, reason }) {
+    async run(msg: CommandoMessage, { member, reason }) {
         reason = getReason(msg, reason);
         try {
             if (
@@ -447,11 +444,7 @@ export class UnmuteCommand extends AdminCommand {
                 throw new Error('That member is not muted');
             }
             member.roles.remove('785839177022963731');
-            const mutes = JSON.parse(
-                readFileSync('./users/mutes.json', 'utf-8')
-            );
-            delete mutes[member.user.id];
-            writeFileSync('./users/mutes.json', JSON.stringify(mutes));
+            await Mutes.destroy({ where: { id: member.user.id } });
         } catch (err) {
             return msg.say(`Failed to unmute member: ${err.message}`);
         }

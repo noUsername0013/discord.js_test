@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UnmuteCommand = exports.MuteCommand = exports.ListBansCommand = exports.UnbanCommand = exports.BanCommand = exports.KickCommand = exports.ExitCommand = exports.SendCommand = exports.RemoveRoleCommand = exports.AddRoleCommand = exports.AddLevelsCommand = void 0;
 const botconfig_json_1 = require("../../../botconfig.json");
 const discord_js_commando_1 = require("discord.js-commando");
-const fs_1 = require("fs");
 const Database_1 = require("../../Database");
 const aliases = botconfig_json_1.commandOptions.aliases;
 class AdminCommand extends discord_js_commando_1.Command {
@@ -357,20 +356,19 @@ class MuteCommand extends AdminCommand {
         expireDate.setTime(expireMillsecs);
         try {
             if (member.hasPermission('ADMINISTRATOR')) {
-                //throw new Error('Cannot mute admins');
+                throw new Error('Cannot mute admins');
             }
-            const mutes = JSON.parse(fs_1.readFileSync('./users/mutes.json', 'utf-8'));
-            if (mutes[member.user.id]) {
+            if (await Database_1.Mutes.findOne({ where: { id: member.id } })) {
                 throw new Error(`<@${member.user.id}> was muted already`);
             }
             member.roles.add('785839177022963731');
-            mutes[member.id] = {
+            const mute = {
                 tag: member.user.tag,
                 duration: durationValue,
                 reason: reason,
                 expireDate: Date.parse(expireDate.toUTCString()),
             };
-            fs_1.writeFileSync('./users/mutes.json', JSON.stringify(mutes));
+            await Database_1.Mutes.create(mute);
         }
         catch (err) {
             return msg.say(`Failed to mute member: ${err.message}`);
@@ -407,16 +405,14 @@ class UnmuteCommand extends AdminCommand {
             ],
         });
     }
-    run(msg, { member, reason }) {
+    async run(msg, { member, reason }) {
         reason = getReason(msg, reason);
         try {
             if (!member.roles.cache.find((r) => r.id === '785839177022963731')) {
                 throw new Error('That member is not muted');
             }
             member.roles.remove('785839177022963731');
-            const mutes = JSON.parse(fs_1.readFileSync('./users/mutes.json', 'utf-8'));
-            delete mutes[member.user.id];
-            fs_1.writeFileSync('./users/mutes.json', JSON.stringify(mutes));
+            await Database_1.Mutes.destroy({ where: { id: member.user.id } });
         }
         catch (err) {
             return msg.say(`Failed to unmute member: ${err.message}`);
