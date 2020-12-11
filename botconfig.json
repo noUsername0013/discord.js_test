@@ -1,0 +1,23 @@
+{
+    "commandOptions": {
+        "prefix": "!",
+        "aliases": {
+            "test": [],
+            "exit": ["stop"],
+            "image": ["pic", "picture", "img"],
+            "mylevel": ["meolevel"],
+            "eval": [],
+            "addlevels": [],
+            "send": ["s"],
+            "addrole": [],
+            "removerole": ["rmrole"],
+            "random": ["rand"],
+            "randomint": ["randint"],
+            "kick": [],
+            "ban": [],
+            "listbans": [],
+            "unban": [],
+            "mute": []
+        }
+    }
+}

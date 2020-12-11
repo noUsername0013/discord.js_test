@@ -1,0 +1,12 @@
+{
+    "typeAcquisition": { "enable": true },
+    "compilerOptions": {
+        "target": "ES2017",
+        "strict": false,
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "resolveJsonModule": true
+    },
+    "compileOnSave": true,
+    "include": ["src", "src/commands"]
+}
