@@ -1,0 +1,2 @@
+//test
+const test = 'test';
