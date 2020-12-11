@@ -1,10 +1,11 @@
 import * as Discord from 'discord.js';
-import * as fs from 'fs';
 import { commandOptions } from '../botconfig.json';
 import { CommandoClient } from 'discord.js-commando';
 import { join } from 'path';
-import * as events from 'events';
 import { Users } from './Database';
+import { config } from 'dotenv';
+config();
+
 const client = new CommandoClient({
     commandPrefix: commandOptions.prefix,
     owner: '488709903737815040',
@@ -20,13 +21,7 @@ client.registry
     .registerCommandsIn(join(__dirname, 'commands/public'))
     .registerCommandsIn(join(__dirname, 'commands/admin'));
 export { client };
-if (!fs.existsSync('./users/users.json')) {
-    console.log('users.json does not exist, creating one');
-    if (!fs.existsSync('./users')) {
-        fs.mkdirSync('./users');
-    }
-    fs.writeFileSync('./users/users.json', '{}', { encoding: 'utf-8' });
-}
+
 async function handleExp(msg: Discord.Message): Promise<void> {
     //喵喵經驗值?
     const author = msg.author.id;
@@ -85,7 +80,7 @@ function welcome(member: Discord.GuildMember): void {
     console.log(`member ${member.user.username} joined`);
 }
 
-client.login(fs.readFileSync('./.token.txt', 'utf-8'));
+client.login(process.env.TOKEN);
 client.once('ready', () => {
     console.log('ready', client.user.tag);
 });
