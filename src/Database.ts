@@ -47,4 +47,5 @@ Mutes.init(
     }
 );
 Users.sync();
+Mutes.sync();
 export { Users };

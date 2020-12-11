@@ -44,3 +44,4 @@ Mutes.init({
     modelName: 'Mutes',
 });
 Users.sync();
+Mutes.sync();
