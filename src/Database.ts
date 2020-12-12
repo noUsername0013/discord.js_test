@@ -35,11 +35,15 @@ Mutes.init(
             allowNull: false,
             primaryKey: true,
         },
+        guildId: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
         tag: {
             type: DataTypes.STRING,
         },
         duration: {
-            type: DataTypes.FLOAT,
+            type: DataTypes.INTEGER,
         },
         reason: {
             type: DataTypes.STRING,

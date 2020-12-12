@@ -389,6 +389,7 @@ export class MuteCommand extends AdminCommand {
 
             const mute = {
                 id: member.user.id,
+                guildId: member.guild.id,
                 tag: member.user.tag,
                 duration: durationValue,
                 reason: reason,
