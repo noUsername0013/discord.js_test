@@ -4,7 +4,15 @@ import { CommandoClient } from 'discord.js-commando';
 import { join } from 'path';
 import { Users } from './Database';
 import { config } from 'dotenv';
+import { checkMutes } from './MutesChecker';
+checkMutes();
 config();
+
+if (!process.env.TOKEN) {
+    throw new Error(
+        'No bot token found in enviroment variables, please make a .env file with TOKEN=[your token] in it'
+    );
+}
 
 const client = new CommandoClient({
     commandPrefix: commandOptions.prefix,
