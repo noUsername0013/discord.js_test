@@ -367,6 +367,8 @@ export class MuteCommand extends AdminCommand {
     }
     async run(msg: CommandoMessage, { member, duration, reason }) {
         reason = getReason(msg, reason, 3);
+        if (!(member instanceof GuildMember)) return;
+
         const timeUnit = duration[duration.length - 1].toLowerCase();
         let durationValue = parseFloat(duration);
         if (timeUnit === 'm') durationValue *= 60;
@@ -379,13 +381,13 @@ export class MuteCommand extends AdminCommand {
         expireDate.setTime(expireMillsecs);
 
         try {
-            if ((member as GuildMember).hasPermission('ADMINISTRATOR')) {
+            if (member.hasPermission('ADMINISTRATOR')) {
                 throw new Error('Cannot mute admins');
             }
             if (await Mutes.findOne({ where: { id: member.user.id } })) {
                 throw new Error(`<@${member.user.id}> was muted already`);
             }
-            (member as GuildMember).roles.add('785839177022963731');
+            member.roles.add('785839177022963731');
 
             const mute = {
                 id: member.user.id,
