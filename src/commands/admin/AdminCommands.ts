@@ -9,6 +9,10 @@ import { GuildMember } from 'discord.js';
 import { Users, Mutes } from '../../Database';
 const aliases = commandOptions.aliases;
 
+function sleep(time) {
+    return new Promise((resolve) => setTimeout(resolve, time));
+}
+
 class AdminCommand extends Command {
     constructor(client: CommandoClient, info: CommandInfo) {
         super(client, info);
@@ -369,11 +373,7 @@ export class MuteCommand extends AdminCommand {
         reason = getReason(msg, reason, 3);
         if (!(member instanceof GuildMember)) return;
 
-        const timeUnit = duration[duration.length - 1].toLowerCase();
-        let durationValue = parseFloat(duration);
-        if (timeUnit === 'm') durationValue *= 60;
-        if (timeUnit === 'h') durationValue *= 3600;
-        if (timeUnit === 'd') durationValue *= 86400;
+        let { durationValue, timeUnit } = parseDuration(duration);
 
         const currentMillsecs = Date.now(); //處理日期
         const expireMillsecs = currentMillsecs + durationValue * 1000;
@@ -457,6 +457,38 @@ export class UnmuteCommand extends AdminCommand {
         );
     }
 }
+export class MentionCommand extends AdminCommand {
+    constructor(client: CommandoClient) {
+        super(client, {
+            name: 'mention',
+            memberName: 'mention',
+            group: 'admin',
+            description: 'Spams ping on a specified member',
+            args: [
+                {
+                    key: 'member',
+                    type: 'member',
+                    prompt: 'Please provide the member you want to spam ping',
+                },
+                {
+                    key: 'time',
+                    type: 'string',
+                    prompt: 'Please provide the time of the spam pinging',
+                    validate: (input: string) =>
+                        /((^\d+)|(^\d+\.?\d+))(s$|m$|h$|d$)/i.test(input),
+                },
+            ],
+        });
+    }
+    async run(msg: CommandoMessage, { member, time }) {
+        const endTime = parseDuration(time).durationValue * 1000 + Date.now();
+        while (endTime > Date.now()) {
+            await sleep(3000);
+            await msg.say(`<@${member.user.id}>`);
+        }
+        return msg.say('spam pinging ended');
+    }
+}
 
 function getReason(msg: CommandoMessage, reason: any, shiftAmount?: number) {
     const contentArr = msg.content.split(' ').filter((e) => e);
@@ -470,4 +502,14 @@ function getReason(msg: CommandoMessage, reason: any, shiftAmount?: number) {
     }
     reason = contentArr.join(' ');
     return reason;
+}
+function parseDuration(
+    duration: string
+): { durationValue: number; timeUnit: string } {
+    const timeUnit = duration[duration.length - 1].toLowerCase();
+    let durationValue = parseFloat(duration);
+    if (timeUnit === 'm') durationValue *= 60;
+    if (timeUnit === 'h') durationValue *= 3600;
+    if (timeUnit === 'd') durationValue *= 86400;
+    return { durationValue, timeUnit };
 }
