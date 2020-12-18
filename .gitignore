@@ -108,6 +108,7 @@ dist
 
 #bot database
 .database.sqlite
+.database.sqlite-journal
 
 #vscode
 .vscode/
