@@ -462,6 +462,7 @@ export class MentionCommand extends AdminCommand {
         super(client, {
             name: 'mention',
             memberName: 'mention',
+            aliases: aliases.mention,
             group: 'admin',
             description: 'Spams ping on a specified member',
             args: [
@@ -486,7 +487,38 @@ export class MentionCommand extends AdminCommand {
             await sleep(3000);
             await msg.say(`<@${member.user.id}>`);
         }
-        return msg.say('spam pinging ended');
+        return msg.say('Spam pinging ended');
+    }
+}
+export class RandomMentionCommand extends AdminCommand {
+    constructor(client: CommandoClient) {
+        super(client, {
+            name: 'randommention',
+            memberName: 'randommention',
+            aliases: aliases.randommention,
+            group: 'admin',
+            description: 'Spams ping on a random member',
+            args: [
+                {
+                    key: 'time',
+                    type: 'string',
+                    prompt: 'Please provide the time of the spam pinging',
+                    validate: (input: string) =>
+                        /((^\d+)|(^\d+\.?\d+))(s$|m$|h$|d$)/i.test(input),
+                },
+            ],
+        });
+    }
+    async run(msg: CommandoMessage, { time }) {
+        const endTime = parseDuration(time).durationValue * 1000 + Date.now();
+        const memberList = (await msg.guild.members.fetch()).array();
+        const member =
+            memberList[Math.floor(Math.random() * memberList.length)];
+        while (endTime > Date.now()) {
+            await sleep(3000);
+            await msg.say(`<@${member.user.id}>`);
+        }
+        return msg.say('Spam pinging ended');
     }
 }
 
