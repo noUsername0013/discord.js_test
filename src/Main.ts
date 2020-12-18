@@ -43,8 +43,6 @@ async function handleExp(msg: Discord.Message): Promise<void> {
         level: user.get('level') as number,
         exp: user.get('exp') as number,
     };
-    console.log(dataValue);
-    console.log(user);
 
     const exp = msg.content.length * 0.2;
     const lvlReq = Math.floor(100 * Math.pow(1.01, dataValue.level));
