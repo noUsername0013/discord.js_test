@@ -4,6 +4,7 @@
     "description": "test discord bot",
     "main": "src/Main.js",
     "type": "commonjs",
+    "repository": "https://github.com/noUsername0013/discord.js_test",
     "scripts": {
         "build": "tsc --moduleResolution node",
         "run": "npm run build",
