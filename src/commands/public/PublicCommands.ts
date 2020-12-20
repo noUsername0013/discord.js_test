@@ -159,18 +159,46 @@ export class HelpOverrideCommand extends Command {
         const groups = this.client.registry.groups;
         const commands = this.client.registry.findCommands(command, false, msg);
         const embeds = [];
-
-        groups.forEach((group) => {
-            let embed = new MessageEmbed()
-                .setTitle(`${group.name}:`)
-                .setColor(0x00ffff);
-            group.commands.forEach((cmd) => {
-                if (cmd.isUsable((msg as unknown) as Message) && !cmd.hidden)
-                    embed.addField(cmd.name, cmd.description, true);
+        if (command === '' || command === 'all') {
+            groups.forEach((group) => {
+                let embed = new MessageEmbed()
+                    .setTitle(`${group.name}:`)
+                    .setColor(0x00ffff);
+                group.commands.forEach((cmd) => {
+                    if (
+                        cmd.isUsable((msg as unknown) as Message) &&
+                        !cmd.hidden
+                    )
+                        embed.addField(cmd.name, cmd.description, true);
+                });
+                embeds.push(embed);
             });
-            embeds.push(embed);
-        });
-        embeds.forEach((e) => msg.say(e));
-        return (null as unknown) as Message;
+            embeds.forEach((e) => msg.say(e));
+            return (null as unknown) as Message;
+        } else {
+            if (commands.length > 2) {
+                return msg.say(
+                    'Multiple commands found. Please be more specific'
+                );
+            } else if (commands.length === 0) {
+                return msg.say('Unable to identify command');
+            } else {
+                const cmd = commands[0];
+                let desc = `**Format:** ${`${this.client.commandPrefix}${
+                    cmd.name
+                } ${cmd.format ? cmd.format : ''}`}\n**Group:** ${
+                    cmd.group.name
+                }`;
+                if (cmd.examples)
+                    desc += `\n**Examples:** ${cmd.examples.join(', ')}`;
+                if (cmd.aliases[0])
+                    desc += `\n**Aliases:** ${cmd.aliases.join(', ')}`;
+                if (cmd.details) desc += `\n**Details:** ${cmd.details}`;
+                let embed = new MessageEmbed()
+                    .setTitle(`${cmd.name}: ${cmd.description}`)
+                    .setDescription(desc);
+                return msg.say(embed);
+            }
+        }
     }
 }
