@@ -7,6 +7,7 @@
     "scripts": {
         "build": "tsc --moduleResolution node",
         "run": "npm run build",
+        "start": "node .",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "",
