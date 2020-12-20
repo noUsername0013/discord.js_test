@@ -1,6 +1,6 @@
 import { commandOptions } from '../../../botconfig.json';
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
-import { MessageAttachment } from 'discord.js';
+import { Message, MessageAttachment, MessageEmbed } from 'discord.js';
 import { Users } from '../../Database';
 const aliases = commandOptions.aliases;
 
@@ -136,5 +136,41 @@ export class ImageCommand extends Command {
     }
     run(msg: CommandoMessage, { URL }) {
         return msg.channel.send(new MessageAttachment(URL));
+    }
+}
+export class HelpOverrideCommand extends Command {
+    constructor(client: CommandoClient) {
+        super(client, {
+            name: 'help',
+            memberName: 'help',
+            group: 'public',
+            description: 'Displays info of commands',
+            args: [
+                {
+                    key: 'command',
+                    type: 'string',
+                    default: '',
+                    prompt: 'What command do you want to view info for',
+                },
+            ],
+        });
+    }
+    async run(msg: CommandoMessage, { command }) {
+        const groups = this.client.registry.groups;
+        const commands = this.client.registry.findCommands(command, false, msg);
+        const embeds = [];
+
+        groups.forEach((group) => {
+            let embed = new MessageEmbed()
+                .setTitle(`${group.name}:`)
+                .setColor(0x00ffff);
+            group.commands.forEach((cmd) => {
+                if (cmd.isUsable((msg as unknown) as Message) && !cmd.hidden)
+                    embed.addField(cmd.name, cmd.description, true);
+            });
+            embeds.push(embed);
+        });
+        embeds.forEach((e) => msg.say(e));
+        return (null as unknown) as Message;
     }
 }

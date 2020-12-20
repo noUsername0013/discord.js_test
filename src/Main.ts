@@ -25,7 +25,7 @@ client.registry
         ['public', 'Public commands'],
     ])
     .registerDefaultGroups()
-    .registerDefaultCommands()
+    .registerDefaultCommands({ help: false })
     .registerCommandsIn(join(__dirname, 'commands/public'))
     .registerCommandsIn(join(__dirname, 'commands/admin'));
 export { client };

@@ -162,7 +162,7 @@ export class SendCommand extends AdminCommand {
             return msg.say(`Failed to sent message: ${err.message}`);
         }
         msg.say('Successfully sent message');
-        return msg.delete({ timeout: 5000 });
+        return msg.delete({ timeout: 5000 } as any);
     }
 }
 export class ExitCommand extends AdminCommand {
@@ -524,8 +524,6 @@ export class RandomMentionCommand extends AdminCommand {
 
 function getReason(msg: CommandoMessage, reason: any, shiftAmount?: number) {
     const contentArr = msg.content.split(' ').filter((e) => e);
-    console.log('contentArr', contentArr);
-    console.log('contentArr\n\n', contentArr);
     shiftAmount = shiftAmount || 2;
     let i = 0;
     while (i < shiftAmount) {
