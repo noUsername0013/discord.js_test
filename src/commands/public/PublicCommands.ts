@@ -194,7 +194,7 @@ export class HelpOverrideCommand extends Command {
                 if (cmd.aliases[0])
                     desc += `\n**Aliases:** ${cmd.aliases.join(', ')}`;
                 if (cmd.details) desc += `\n**Details:** ${cmd.details}`;
-                let embed = new MessageEmbed()
+                const embed = new MessageEmbed()
                     .setTitle(`${cmd.name}: ${cmd.description}`)
                     .setDescription(desc);
                 return msg.say(embed);
