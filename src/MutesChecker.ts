@@ -1,6 +1,5 @@
 import { TextChannel } from 'discord.js';
 import { Mutes } from './Database';
-import { client } from './Main';
 
 async function sleep(time: number): Promise<void> {
     return new Promise((resolve) => {
@@ -15,8 +14,10 @@ export async function checkMutes(): Promise<void> {
         mutes.forEach(async (m) => {
             if ((await m.get('expireDate')) < Date.now()) {
                 console.log('removing mute of ' + m.get('id'));
-                const user = await client.users.fetch(m.get('id') as string);
-                const guild = await client.guilds.fetch(
+                const user = await globalThis.client.users.fetch(
+                    m.get('id') as string
+                );
+                const guild = await globalThis.client.guilds.fetch(
                     m.get('guildId') as string
                 );
                 const member = await guild.members.fetch(user.id);

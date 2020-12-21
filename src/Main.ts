@@ -13,11 +13,11 @@ if (!process.env.TOKEN) {
         'No bot token found in enviroment variables, please make a .env file with TOKEN=[your token] in it'
     );
 }
-
 const client = new CommandoClient({
     commandPrefix: commandOptions.prefix,
-    owner: '488709903737815040',
+    owner: process.env.OWNERS.split(' '),
 });
+globalThis.client = client;
 client.registry
     .registerDefaultTypes()
     .registerGroups([
@@ -28,7 +28,6 @@ client.registry
     .registerDefaultCommands({ help: false })
     .registerCommandsIn(join(__dirname, 'commands/public'))
     .registerCommandsIn(join(__dirname, 'commands/admin'));
-export { client };
 
 async function handleExp(msg: Discord.Message): Promise<void> {
     //喵喵經驗值?
