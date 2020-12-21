@@ -9,7 +9,7 @@ import { GuildMember } from 'discord.js';
 import { Users, Mutes } from '../../Database';
 const aliases = commandOptions.aliases;
 
-function sleep(time) {
+function sleep(time: number) {
     return new Promise((resolve) => setTimeout(resolve, time));
 }
 
