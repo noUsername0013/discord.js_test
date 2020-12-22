@@ -31,7 +31,7 @@ export class NumGuessGameCommand extends Command {
         }
 
         try {
-            msg.say('Enter a 4 digit number. Enter cancel to cancel');
+            msg.say('Enter a 4 digit number. Enter exit to exit');
             while (true) {
                 const response = (
                     await msg.channel.awaitMessages(
@@ -39,9 +39,12 @@ export class NumGuessGameCommand extends Command {
                         { time: 180000, errors: ['time'], max: 1 }
                     )
                 ).first();
-                if (response.content.toLowerCase() === 'cancel') {
+                if (
+                    response.content.toLowerCase() === 'cancel' ||
+                    response.content.toLowerCase() === 'exit'
+                ) {
                     NumGuessGameCommand.popPlayer(msg.author.id);
-                    return msg.say('Cancelled');
+                    return msg.say('Exited');
                 }
                 if (response.content.toLowerCase() === 'debug') {
                     NumGuessGameCommand.popPlayer(msg.author.id);
@@ -65,7 +68,7 @@ export class NumGuessGameCommand extends Command {
                         if (answer.includes(response.content[i])) bCount++;
                     }
                     msg.say(
-                        `${aCount}A${bCount}B\nEnter a 4 digit number. Enter cancel to cancel`
+                        `${aCount}A${bCount}B\nEnter a 4 digit number. Enter exit to exit`
                     );
                 }
             }
