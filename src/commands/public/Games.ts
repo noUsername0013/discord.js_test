@@ -23,6 +23,7 @@ export class NumGuessGameCommand extends Command {
         NumGuessGameCommand.players.push(msg.author.id);
         const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
         let answer = '';
+        let guessCount = 0;
         for (let i = 0; i < 4; i++) {
             answer =
                 digits
@@ -48,15 +49,20 @@ export class NumGuessGameCommand extends Command {
                 }
                 if (response.content.toLowerCase() === 'debug') {
                     NumGuessGameCommand.popPlayer(msg.author.id);
-                    return msg.say('Correct answer: ' + answer);
+                    return msg.say(
+                        `Correct answer: ${answer}. You found the secret answer!`
+                    );
                 }
                 if (!/^\d{4}$/i.test(response.content)) {
                     msg.say('Invalid input');
                     continue;
                 }
+                guessCount++;
                 if (response.content === answer) {
                     NumGuessGameCommand.popPlayer(msg.author.id);
-                    return msg.say('Correct answer: ' + answer);
+                    return msg.say(
+                        `Correct answer: ${answer} with ${guessCount} guesses`
+                    );
                 } else {
                     let aCount = 0,
                         bCount = 0;
