@@ -1,4 +1,5 @@
 import { commandOptions } from '../../../botconfig.json';
+import { sleep } from '../../UtilFuncs';
 import {
     Command,
     CommandInfo,
@@ -9,14 +10,11 @@ import { GuildMember } from 'discord.js';
 import { Users, Mutes } from '../../Database';
 const aliases = commandOptions.aliases;
 
-function sleep(time: number) {
-    return new Promise((resolve) => setTimeout(resolve, time));
-}
-
-class AdminCommand extends Command {
+abstract class AdminCommand extends Command {
     constructor(client: CommandoClient, info: CommandInfo) {
+        info.group = 'admin';
+        info.userPermissions = ['ADMINISTRATOR'];
         super(client, info);
-        this.userPermissions = ['ADMINISTRATOR'];
     }
 }
 
