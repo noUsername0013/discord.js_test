@@ -109,6 +109,8 @@ export class RPSGame extends GameCommand {
                     key: 'rounds',
                     prompt: '',
                     default: '1',
+                    min: 1,
+                    max: 10,
                 },
             ],
         });
