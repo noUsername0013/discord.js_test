@@ -103,41 +103,65 @@ export class RPSGame extends GameCommand {
             memberName: 'rpsgame',
             group: 'public',
             description: 'Rock paper scissors game',
+            args: [
+                {
+                    type: 'integer',
+                    key: 'rounds',
+                    prompt: '',
+                    default: '1',
+                },
+            ],
         });
     }
-    async run(msg: CommandoMessage) {
+    async run(msg: CommandoMessage, { rounds }) {
+        rounds = parseInt(rounds);
         const emojiTable = { '✂️': 'scissors', '🪨': 'rock', '🧻': 'paper' };
         const reverseEmojiTable = { scissors: '✂️', rock: '🪨', paper: '🧻' };
         const winTable = {
-            rock: { rock: 'Tie', paper: 'lost', scissors: 'won' },
-            paper: { rock: 'won', paper: 'Tie', scissors: 'lost' },
-            scissors: { rock: 'lost', paper: 'won', scissors: 'Tie' },
+            rock: { rock: 'tie', paper: 'lose', scissors: 'win' },
+            paper: { rock: 'win', paper: 'tie', scissors: 'lose' },
+            scissors: { rock: 'lose', paper: 'win', scissors: 'tie' },
         };
-        const cGuess = ['rock', 'paper', 'scissors'][
-            Math.floor(Math.random() * 3)
-        ];
-        msg.react('✂️');
-        msg.react('🪨');
-        msg.react('🧻');
-        try {
-            const responseEmoji = (
-                await ((msg as unknown) as Message).awaitReactions(
-                    (reaction: MessageReaction, user: User) => {
-                        const name = reaction.emoji.name;
-                        return (
-                            user.id === msg.author.id &&
-                            (name === '✂️' || name === '🪨' || name === '🧻')
-                        );
-                    },
-                    { max: 1, time: 10000, errors: ['time'] }
-                )
-            ).first().emoji.name;
-            const response = emojiTable[responseEmoji];
-            const result = winTable[response][cGuess];
-            const resultMsg = `${result === 'Tie' ? '' : 'You'} ${result}`;
-            return msg.say(`${reverseEmojiTable[cGuess]}\n${resultMsg}`);
-        } catch {
-            return msg.say('Timed out');
+        let wins = 0;
+        for (let i = 0; i < rounds; i++) {
+            const cGuess = ['rock', 'paper', 'scissors'][
+                Math.floor(Math.random() * 3)
+            ];
+            const roundMsg = await msg.say(`Round ${i + 1}`);
+            if (roundMsg instanceof Message) {
+                roundMsg.react('✂️');
+                roundMsg.react('🪨');
+                roundMsg.react('🧻');
+            }
+            try {
+                const responseEmoji = (
+                    await ((roundMsg as unknown) as Message).awaitReactions(
+                        (reaction: MessageReaction, user: User) => {
+                            const name = reaction.emoji.name;
+                            return (
+                                user.id === msg.author.id &&
+                                (name === '✂️' || name === '🪨' || name === '🧻')
+                            );
+                        },
+                        { max: 1, time: 10000, errors: ['time'] }
+                    )
+                ).first().emoji.name;
+                msg.say(`My guess: ${reverseEmojiTable[cGuess]}`);
+                const response = emojiTable[responseEmoji];
+                const result = winTable[response][cGuess];
+                if (result === 'win') {
+                    wins++;
+                } else if (result === 'tie') {
+                    i--;
+                }
+            } catch {
+                return msg.say('Timed out');
+            }
+        }
+        if (wins / rounds > 0.5) {
+            return msg.say('You won!');
+        } else {
+            return msg.say('You lost');
         }
     }
 }
