@@ -119,21 +119,25 @@ export class RPSGame extends GameCommand {
         msg.react('✂️');
         msg.react('🪨');
         msg.react('🧻');
-        const responseEmoji = (
-            await ((msg as unknown) as Message).awaitReactions(
-                (reaction: MessageReaction, user: User) => {
-                    const name = reaction.emoji.name;
-                    return (
-                        user.id === msg.author.id &&
-                        (name === '✂️' || name === '🪨' || name === '🧻')
-                    );
-                },
-                { max: 1 }
-            )
-        ).first().emoji.name;
-        const response = emojiTable[responseEmoji];
-        const result = winTable[response][cGuess];
-        const resultMsg = `${result === 'Tie' ? '' : 'You'} ${result}`;
-        return msg.say(`${reverseEmojiTable[cGuess]}\n${resultMsg}`);
+        try {
+            const responseEmoji = (
+                await ((msg as unknown) as Message).awaitReactions(
+                    (reaction: MessageReaction, user: User) => {
+                        const name = reaction.emoji.name;
+                        return (
+                            user.id === msg.author.id &&
+                            (name === '✂️' || name === '🪨' || name === '🧻')
+                        );
+                    },
+                    { max: 1, time: 10000, errors: ['time'] }
+                )
+            ).first().emoji.name;
+            const response = emojiTable[responseEmoji];
+            const result = winTable[response][cGuess];
+            const resultMsg = `${result === 'Tie' ? '' : 'You'} ${result}`;
+            return msg.say(`${reverseEmojiTable[cGuess]}\n${resultMsg}`);
+        } catch {
+            return msg.say('Timed out');
+        }
     }
 }
