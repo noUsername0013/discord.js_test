@@ -205,7 +205,7 @@ export class KickCommand extends AdminCommand {
         });
     }
     async run(msg: CommandoMessage, { member, reason }) {
-        reason = getReason(msg, reason);
+        reason = getReason(msg);
         try {
             await member.kick(reason);
         } catch (err) {
@@ -243,7 +243,7 @@ export class BanCommand extends AdminCommand {
         });
     }
     async run(msg: CommandoMessage, { member, reason }) {
-        reason = getReason(msg, reason);
+        reason = getReason(msg);
         try {
             await member.ban({ days: 0, reason });
         } catch (err) {
@@ -282,7 +282,7 @@ export class UnbanCommand extends AdminCommand {
         });
     }
     async run(msg: CommandoMessage, { user, reason }) {
-        reason = getReason(msg, reason);
+        reason = getReason(msg);
         try {
             await msg.guild.members.unban(user.id, reason);
         } catch (err) {
@@ -368,7 +368,7 @@ export class MuteCommand extends AdminCommand {
         });
     }
     async run(msg: CommandoMessage, { member, duration, reason }) {
-        reason = getReason(msg, reason, 3);
+        reason = getReason(msg, 3);
         if (!(member instanceof GuildMember)) return;
 
         let { durationValue, timeUnit } = parseDuration(duration);
@@ -438,7 +438,7 @@ export class UnmuteCommand extends AdminCommand {
         });
     }
     async run(msg: CommandoMessage, { member, reason }) {
-        reason = getReason(msg, reason);
+        reason = getReason(msg);
         try {
             if (
                 !member.roles.cache.find((r) => r.id === '785839177022963731')
@@ -520,7 +520,7 @@ export class RandomMentionCommand extends AdminCommand {
     }
 }
 
-function getReason(msg: CommandoMessage, reason: any, shiftAmount?: number) {
+function getReason(msg: CommandoMessage, shiftAmount?: number) {
     const contentArr = msg.content.split(' ').filter((e) => e);
     shiftAmount = shiftAmount || 2;
     let i = 0;
@@ -528,8 +528,7 @@ function getReason(msg: CommandoMessage, reason: any, shiftAmount?: number) {
         contentArr.shift();
         i++;
     }
-    reason = contentArr.join(' ');
-    return reason;
+    return contentArr.join(' ');
 }
 function parseDuration(
     duration: string
