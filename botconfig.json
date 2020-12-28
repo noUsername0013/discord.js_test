@@ -18,8 +18,11 @@
             "listbans": [],
             "unban": [],
             "mute": [],
+            "unmute": [],
             "mention": ["tag"],
-            "randommention": ["randmention", "randtag", "randomtag"]
+            "randommention": ["randmention", "randtag", "randomtag"],
+            "rpsgame": [],
+            "numberguess": []
         }
     }
 }

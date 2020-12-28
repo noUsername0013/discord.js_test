@@ -422,6 +422,7 @@ export class UnmuteCommand extends AdminCommand {
             memberName: 'unmute',
             group: 'admin',
             description: 'Unmutes the specified member',
+            aliases: aliases.unmute,
             args: [
                 {
                     key: 'member',

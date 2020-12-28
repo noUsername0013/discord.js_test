@@ -1,11 +1,12 @@
 import { Message, MessageReaction, ReactionEmoji, User } from 'discord.js';
-import { sleep } from '../../UtilFuncs';
 import {
     Command,
     CommandInfo,
     CommandoClient,
     CommandoMessage,
 } from 'discord.js-commando';
+import { commandOptions } from '../../../botconfig.json';
+const aliases = commandOptions.aliases;
 
 abstract class GameCommand extends Command {
     protected static players: string[] = [];
@@ -27,6 +28,7 @@ export class NumGuessGameCommand extends GameCommand {
             memberName: 'numberguess',
             group: 'public',
             description: 'Number guessing game',
+            aliases: aliases.numberguess,
         });
     }
     async run(msg: CommandoMessage) {
@@ -103,6 +105,7 @@ export class RPSGame extends GameCommand {
             memberName: 'rpsgame',
             group: 'public',
             description: 'Rock paper scissors game',
+            aliases: aliases.rpsgame,
             args: [
                 {
                     type: 'integer',
