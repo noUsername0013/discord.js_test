@@ -1,4 +1,4 @@
-import { Message, MessageReaction, ReactionEmoji, User } from 'discord.js';
+import { Message, MessageReaction, User } from 'discord.js';
 import {
     Command,
     CommandInfo,
