@@ -4,8 +4,8 @@ import { CommandoClient } from 'discord.js-commando';
 import { join } from 'path';
 import { Users } from './Database';
 import { config } from 'dotenv';
-import { checkMutes } from './MutesChecker';
-checkMutes();
+import { checkers } from './Checkers';
+checkers();
 config();
 
 if (!process.env.TOKEN) {

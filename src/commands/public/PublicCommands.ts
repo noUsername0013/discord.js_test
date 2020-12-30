@@ -1,7 +1,7 @@
 import { commandOptions } from '../../../botconfig.json';
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
 import { Message, MessageAttachment, MessageEmbed } from 'discord.js';
-import { Users } from '../../Database';
+import { Users, Birthdays } from '../../Database';
 const aliases = commandOptions.aliases;
 
 export class TestCommand extends Command {
@@ -198,6 +198,127 @@ export class HelpOverrideCommand extends Command {
                     .setTitle(`${cmd.name}: ${cmd.description}`)
                     .setDescription(desc);
                 return msg.say(embed);
+            }
+        }
+    }
+}
+export class BirthdayCommand extends Command {
+    constructor(client: CommandoClient) {
+        super(client, {
+            name: 'birthday',
+            memberName: 'birthday',
+            group: 'public',
+            description: "Command for recording your friend's birthday",
+            args: [
+                {
+                    key: 'option',
+                    type: 'string',
+                    oneOf: ['add', 'remove', 'lookup', 'list'],
+                    prompt: 'What do you want to do?<add|remove|lookup|list>',
+                },
+                {
+                    key: 'name',
+                    type: 'string',
+                    prompt: '',
+                    default: '',
+                },
+                {
+                    key: 'birthday',
+                    type: 'string',
+                    prompt: '',
+                    default: '',
+                    validate: (input: string) => {
+                        if (
+                            !/^(1[0-2]|0[1-9]|[1-9])(\/|-)([1-9]|0[1-9]|1[0-9]|2[0-9]|3[0-1])$/.test(
+                                input
+                            )
+                        ) {
+                            return false;
+                        }
+                        input.replace('-', '/');
+                        const month = parseInt(input.split('/')[0]);
+                        const day = parseInt(input.split('/')[1]);
+                        const daysInAMonth = [
+                            31,
+                            29,
+                            31,
+                            30,
+                            31,
+                            30,
+                            31,
+                            31,
+                            30,
+                            31,
+                            30,
+                            31,
+                        ];
+                        if (day > daysInAMonth[month - 1]) {
+                            return false;
+                        }
+                        return true;
+                    },
+                },
+            ],
+        });
+    }
+    async run(msg: CommandoMessage, { option, name, birthday }) {
+        birthday = birthday.replace('-', '/');
+        birthday = `${parseInt(birthday.split('/')[0]).toString}/${
+            parseInt(birthday.split('/')[1]).toString
+        }`;
+        switch (option) {
+            case 'add': {
+                if (name === '')
+                    return msg.say("Please provide the person's name");
+                if (birthday === '')
+                    return msg.say("Please provide the person's birthday");
+                try {
+                    await Birthdays.create({
+                        userId: msg.author.id,
+                        birthday: birthday,
+                        name: name,
+                    });
+                } catch (e) {
+                    console.log(e);
+                    return msg.say('Failed to add birthday: Duplicate name');
+                }
+                return msg.say('Successfully added birthday');
+            }
+            case 'remove': {
+                if (name === '')
+                    return msg.say("Please provide the person's name");
+                const deleted = !!(await Birthdays.destroy({
+                    where: { name: name, userId: msg.author.id },
+                }));
+                if (!deleted) return msg.say(`Cannot find name: ${name}`);
+                return msg.say('Successfully removed birthday');
+            }
+            case 'lookup': {
+                if (name === '')
+                    return msg.say("Please provide the person's name");
+                const birthday = await Birthdays.findOne({
+                    where: { name: name, userId: msg.author.id },
+                });
+                if (!birthday) return msg.say(`Cannot find name: ${name}`);
+                return msg.say(
+                    `${birthday.get('name')}'s birthday is on ${birthday.get(
+                        'birthday'
+                    )}`
+                );
+            }
+            case 'list': {
+                const birthdayList = await Birthdays.findAll({
+                    where: { userId: msg.author.id },
+                });
+                if (!birthdayList[0])
+                    return msg.say('You have no birthdays stored');
+                let returnMsg = '';
+                birthdayList.forEach((birthday) => {
+                    returnMsg += `Name: ${birthday.get(
+                        'name'
+                    )} Birthday: ${birthday.get('birthday')}\n`;
+                });
+                return msg.say(returnMsg);
             }
         }
     }

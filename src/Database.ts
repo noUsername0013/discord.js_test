@@ -8,6 +8,7 @@ const seq = new Sequelize({
 
 class Users extends Model {}
 class Mutes extends Model {}
+class Birthdays extends Model {}
 Users.init(
     {
         id: {
@@ -57,6 +58,25 @@ Mutes.init(
         modelName: 'Mutes',
     }
 );
+Birthdays.init(
+    {
+        userId: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        name: {
+            type: DataTypes.STRING,
+        },
+        birthday: {
+            type: DataTypes.STRING,
+        },
+    },
+    {
+        sequelize: seq,
+        modelName: 'Birthdays',
+    }
+);
 Users.sync();
 Mutes.sync();
-export { Users, Mutes };
+Birthdays.sync();
+export { Users, Mutes, Birthdays };
