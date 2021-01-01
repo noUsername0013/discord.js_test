@@ -1,4 +1,10 @@
-import * as Discord from 'discord.js';
+import {
+    TextChannel,
+    MessageAttachment,
+    Message,
+    GuildMember,
+    Channel,
+} from 'discord.js';
 import { commandOptions } from '../botconfig.json';
 import { CommandoClient } from 'discord.js-commando';
 import { join } from 'path';
@@ -29,7 +35,7 @@ client.registry
     .registerCommandsIn(join(__dirname, 'commands/public'))
     .registerCommandsIn(join(__dirname, 'commands/admin'));
 
-async function handleExp(msg: Discord.Message): Promise<void> {
+async function handleExp(msg: Message): Promise<void> {
     //喵喵經驗值?
     const author = msg.author.id;
     let user = await Users.findOne({ where: { id: author } });
@@ -55,13 +61,13 @@ async function handleExp(msg: Discord.Message): Promise<void> {
     user.update(dataValue);
 }
 
-function onMessage(msg: Discord.Message): void {
+function onMessage(msg: Message): void {
     //處理訊息
     handleExp(msg);
 }
-function welcome(member: Discord.GuildMember): void {
+function welcome(member: GuildMember): void {
     //歡迎新成員
-    let ch: Discord.Channel;
+    let ch: Channel;
     try {
         ch = member.guild.channels.cache.find(
             (ch) => ch.id === '775699083108024333'
@@ -69,11 +75,9 @@ function welcome(member: Discord.GuildMember): void {
     } catch (err) {
         console.error(err);
     }
-    if (ch instanceof Discord.TextChannel) {
+    if (ch instanceof TextChannel) {
         ch.send(`Welcome <@${member.id}>!`);
-        const attachment = new Discord.MessageAttachment(
-            member.user.avatarURL()
-        );
+        const attachment = new MessageAttachment(member.user.avatarURL());
         console.log(attachment);
         ch.send(attachment);
     }
@@ -89,6 +93,6 @@ client.login(process.env.TOKEN);
 client.on('ready', () => {
     console.log('ready', client.user.tag);
 });
-client.on('message', (msg) => onMessage(msg));
+client.on('message', onMessage);
 
 client.on('guildMemberAdd', (member) => welcome(member));
