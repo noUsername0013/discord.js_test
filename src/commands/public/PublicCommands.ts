@@ -323,3 +323,43 @@ export class BirthdayCommand extends Command {
         }
     }
 }
+export class GetDayCommand extends Command {
+    constructor(client: CommandoClient) {
+        super(client, {
+            name: 'getday',
+            memberName: 'getday',
+            group: 'public',
+            description: 'Command for sleepyboy',
+            args: [
+                {
+                    key: 'year',
+                    type: 'integer',
+                    prompt: 'Please input year',
+                },
+                {
+                    key: 'month',
+                    type: 'integer',
+                    prompt: 'Please input month',
+                },
+                {
+                    key: 'day',
+                    type: 'integer',
+                    prompt: 'Please input day',
+                },
+            ],
+        });
+    }
+    run(msg: CommandoMessage, { year, month, day }) {
+        const days = [
+            'Sunday',
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday',
+        ];
+        const dayNum = new Date(year, month - 1, day).getDay();
+        return msg.say(`${days[dayNum]}(${dayNum})`);
+    }
+}
