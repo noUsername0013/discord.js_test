@@ -2,6 +2,7 @@ import { commandOptions } from '../../../botconfig.json';
 import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando';
 import { Message, MessageAttachment, MessageEmbed } from 'discord.js';
 import { Users, Birthdays } from '../../Database';
+import { get } from 'https';
 const aliases = commandOptions.aliases;
 
 export class TestCommand extends Command {
@@ -263,9 +264,9 @@ export class BirthdayCommand extends Command {
     }
     async run(msg: CommandoMessage, { option, name, birthday }) {
         birthday = birthday.replace('-', '/');
-        birthday = `${parseInt(birthday.split('/')[0]).toString}/${
-            parseInt(birthday.split('/')[1]).toString
-        }`;
+        birthday = `${parseInt(birthday.split('/')[0]).toString()}/${parseInt(
+            birthday.split('/')[1]
+        ).toString()}`;
         switch (option) {
             case 'add': {
                 if (name === '')
@@ -361,5 +362,44 @@ export class GetDayCommand extends Command {
         ];
         const dayNum = new Date(year, month - 1, day).getDay();
         return msg.say(`${days[dayNum]}(${dayNum})`);
+    }
+}
+export class ReadFileCommand extends Command {
+    constructor(client: CommandoClient) {
+        super(client, {
+            name: 'readfile',
+            memberName: 'readfile',
+            group: 'public',
+            description: 'Reads the content of the attached file and sends it',
+        });
+    }
+    run(msg: CommandoMessage) {
+        const attachment = msg.attachments.first();
+        if (!attachment)
+            return msg.say('Please attach a file to use this command');
+        const extension = attachment.name.match(/\w+(?<=\.\w+)$/i)[0] ?? '';
+        if (attachment.size > 4096)
+            return msg.say('Error: Cannot read file larger than 4KB');
+
+        //download file from discord
+        get(attachment.url, (res) => {
+            res.setEncoding('utf8');
+            if (res.statusCode !== 200) {
+                msg.say('Error: Failed to download file');
+                return;
+            }
+            let content = '';
+            res.on('data', (chunk) => (content += chunk));
+            res.on('end', () => {
+                //Hack: sort of escape triple backticks(```)
+                content = content.replace(/```/g, '`\u200b`\u200b`');
+                let sentMsg = `\`\`\`${extension}\n${content}\n\`\`\``;
+                if (sentMsg.length < 2000) {
+                    msg.say(sentMsg);
+                } else {
+                    msg.say('Error: File content too large to be sent');
+                }
+            });
+        });
     }
 }
