@@ -31,7 +31,7 @@ export class MyLevelCommand extends Command {
     }
     async run(msg: CommandoMessage) {
         return msg.say(
-            `Your level is ${await (
+            `Your level is ${(
                 await Users.findOne({ where: { id: msg.author.id } })
             ).get('level')}`
         );
@@ -236,7 +236,7 @@ export class BirthdayCommand extends Command {
                         ) {
                             return false;
                         }
-                        input.replace('-', '/');
+                        input = input.replace('-', '/');
                         const month = parseInt(input.split('/')[0]);
                         const day = parseInt(input.split('/')[1]);
                         const daysInAMonth = [
@@ -262,21 +262,21 @@ export class BirthdayCommand extends Command {
             ],
         });
     }
-    async run(msg: CommandoMessage, { option, name, birthday }) {
-        birthday = birthday.replace('-', '/');
-        birthday = `${parseInt(birthday.split('/')[0]).toString()}/${parseInt(
-            birthday.split('/')[1]
+    async run(msg: CommandoMessage, { option, name, date }) {
+        date = date.replace('-', '/');
+        date = `${parseInt(date.split('/')[0]).toString()}/${parseInt(
+            date.split('/')[1]
         ).toString()}`;
         switch (option) {
             case 'add': {
                 if (name === '')
                     return msg.say("Please provide the person's name");
-                if (birthday === '')
+                if (date === '')
                     return msg.say("Please provide the person's birthday");
                 try {
                     await Birthdays.create({
                         userId: msg.author.id,
-                        birthday: birthday,
+                        birthday: date,
                         name: name,
                     });
                 } catch (e) {

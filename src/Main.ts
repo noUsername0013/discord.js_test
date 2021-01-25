@@ -66,23 +66,23 @@ function onMessage(msg: Message): void {
 }
 function welcome(member: GuildMember): void {
     //歡迎新成員
-    let ch: Channel;
+    let channel: Channel;
     try {
-        ch = member.guild.channels.cache.find(
+        channel = member.guild.channels.cache.find(
             (ch) => ch.id === '775699083108024333'
         );
     } catch (err) {
         console.error(err);
     }
-    if (ch instanceof TextChannel) {
-        ch.send(`Welcome <@${member.id}>!`);
+    if (channel instanceof TextChannel) {
+        channel.send(`Welcome <@${member.id}>!`);
         const attachment = new MessageAttachment(member.user.avatarURL());
         console.log(attachment);
-        ch.send(attachment);
+        channel.send(attachment);
     }
 
     const role = member.guild.roles.cache.find(
-        (role) => role.id === '775700051849904149'
+        (r) => r.id === '775700051849904149'
     );
     member.guild.roles.add(role);
     console.log(`member ${member.user.username} joined`);
