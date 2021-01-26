@@ -94,4 +94,4 @@ client.on('ready', () => {
 });
 client.on('message', onMessage);
 
-client.on('guildMemberAdd', (member) => welcome(member));
+client.on('guildMemberAdd', welcome);

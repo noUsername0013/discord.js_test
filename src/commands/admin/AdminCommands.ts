@@ -1,13 +1,13 @@
-import { commandOptions } from '../../../botconfig.json';
-import { sleep } from '../../UtilFuncs';
+import { GuildMember, Role, TextChannel, User } from 'discord.js';
 import {
     Command,
     CommandInfo,
     CommandoClient,
     CommandoMessage,
 } from 'discord.js-commando';
-import { GuildMember } from 'discord.js';
-import { Users, Mutes } from '../../Database';
+import { commandOptions } from '../../../botconfig.json';
+import { Mutes, Users } from '../../Database';
+import { sleep } from '../../UtilFuncs';
 const aliases = commandOptions.aliases;
 
 abstract class AdminCommand extends Command {
@@ -43,7 +43,10 @@ export class AddLevelsCommand extends AdminCommand {
             ],
         });
     }
-    async run(msg: CommandoMessage, { level, member }) {
+    async run(
+        msg: CommandoMessage,
+        { level, member }: { level: string; member: GuildMember }
+    ) {
         if (!member) {
             member = msg.guild.members.resolve(msg.author);
         }
@@ -82,7 +85,10 @@ export class AddRoleCommand extends AdminCommand {
             ],
         });
     }
-    async run(msg: CommandoMessage, { role, member }) {
+    async run(
+        msg: CommandoMessage,
+        { role, member }: { role: Role; member: GuildMember }
+    ) {
         try {
             await member.roles.add(role);
         } catch (err) {
@@ -115,7 +121,10 @@ export class RemoveRoleCommand extends AdminCommand {
             ],
         });
     }
-    async run(msg: CommandoMessage, { role, member }) {
+    async run(
+        msg: CommandoMessage,
+        { role, member }: { role: Role; member: GuildMember }
+    ) {
         try {
             await member.roles.remove(role);
         } catch (err) {
@@ -150,7 +159,7 @@ export class SendCommand extends AdminCommand {
             ],
         });
     }
-    async run(msg: CommandoMessage, { channel }) {
+    async run(msg: CommandoMessage, { channel }: { channel: TextChannel }) {
         const contentArr = msg.content.split(' ');
         contentArr.shift();
         contentArr.shift();
@@ -175,8 +184,8 @@ export class ExitCommand extends AdminCommand {
     }
     async run(msg: CommandoMessage) {
         return msg.say('Bot stopped').then(
-            (_) => process.exit(),
-            (_) => process.exit()
+            () => process.exit(),
+            () => process.exit()
         );
     }
 }
@@ -204,17 +213,19 @@ export class KickCommand extends AdminCommand {
             ],
         });
     }
-    async run(msg: CommandoMessage, { member, reason }) {
-        reason = getReason(msg);
+    async run(
+        msg: CommandoMessage,
+        { member, reason }: { member: GuildMember; reason: string[] }
+    ) {
         try {
-            await member.kick(reason);
+            await member.kick(reason.join(' '));
         } catch (err) {
             return msg.say(`Failed to kick member: ${err.message}`);
         }
         return msg.say(
-            `Successfully kicked <@${member.user.id}> ${reason ? 'for' : ''} ${
-                reason ? reason : ''
-            }`
+            `Successfully kicked <@${member.user.id}> ${
+                reason.join(' ') ? 'for' : ''
+            } ${reason.join(' ') ? reason.join(' ') : ''}`
         );
     }
 }
@@ -242,18 +253,20 @@ export class BanCommand extends AdminCommand {
             ],
         });
     }
-    async run(msg: CommandoMessage, { member, reason }) {
-        reason = getReason(msg);
+    async run(
+        msg: CommandoMessage,
+        { member, reason }: { member: GuildMember; reason: string[] }
+    ) {
         try {
-            await member.ban({ days: 0, reason });
+            await member.ban({ days: 0, reason: reason.join(' ') });
         } catch (err) {
             console.error(err);
             return msg.say(`Failed to ban member: ${err.message}`);
         }
         return msg.say(
-            `Successfully banned <@${member.user.id}> ${reason ? 'for' : ''} ${
-                reason ? reason : ''
-            }`
+            `Successfully banned <@${member.user.id}> ${
+                reason.join(' ') ? 'for' : ''
+            } ${reason.join(' ') ? reason.join(' ') : ''}`
         );
     }
 }
@@ -281,17 +294,19 @@ export class UnbanCommand extends AdminCommand {
             ],
         });
     }
-    async run(msg: CommandoMessage, { user, reason }) {
-        reason = getReason(msg);
+    async run(
+        msg: CommandoMessage,
+        { user, reason }: { user: User; reason: string[] }
+    ) {
         try {
-            await msg.guild.members.unban(user.id, reason);
+            await msg.guild.members.unban(user.id, reason.join(' '));
         } catch (err) {
             return msg.say(`Failed to unban member: ${err.message}`);
         }
         return msg.say(
-            `Successfully unbanned <@${user.id}> ${reason ? 'for' : ''} ${
-                reason ? reason : ''
-            }`
+            `Successfully unbanned <@${user.id}> ${
+                reason.join(' ') ? 'for' : ''
+            } ${reason.join(' ') ? reason.join(' ') : ''}`
         );
     }
 }
@@ -354,8 +369,13 @@ export class MuteCommand extends AdminCommand {
                     key: 'duration',
                     type: 'string',
                     prompt: 'Please provide the duration of the mute',
-                    validate: (input: string) =>
-                        /((^\d+)|(^\d+\.?\d+))(s$|m$|h$|d$)/i.test(input),
+                    validate: (input: string) => {
+                        if (/((^\d+)|(^\d+\.?\d+))(s$|m$|h$|d$)/i.test(input)) {
+                            return true;
+                        } else {
+                            return 'Invalid duration';
+                        }
+                    },
                 },
                 {
                     key: 'reason',
@@ -367,10 +387,14 @@ export class MuteCommand extends AdminCommand {
             ],
         });
     }
-    async run(msg: CommandoMessage, { member, duration, reason }) {
-        reason = getReason(msg, 3);
-        if (!(member instanceof GuildMember)) return;
-
+    async run(
+        msg: CommandoMessage,
+        {
+            member,
+            duration,
+            reason,
+        }: { member: GuildMember; duration: string; reason: string[] }
+    ) {
         let { durationValue, timeUnit } = parseDuration(duration);
 
         const currentMillsecs = Date.now(); //處理日期
@@ -392,7 +416,7 @@ export class MuteCommand extends AdminCommand {
                 guildId: member.guild.id,
                 tag: member.user.tag,
                 duration: durationValue,
-                reason: reason,
+                reason: reason.join(' '),
                 expireDate: Date.parse(expireDate.toUTCString()),
             };
             await Mutes.create(mute);
@@ -411,7 +435,7 @@ export class MuteCommand extends AdminCommand {
                     : durationValue / 86400 + ' days'
             }(Expires in ${expireDate.toLocaleString(
                 'en'
-            )} GMT+8) for ${reason}`
+            )} GMT+8) for ${reason.join(' ')}`
         );
     }
 }
@@ -438,8 +462,10 @@ export class UnmuteCommand extends AdminCommand {
             ],
         });
     }
-    async run(msg: CommandoMessage, { member, reason }) {
-        reason = getReason(msg);
+    async run(
+        msg: CommandoMessage,
+        { member, reason }: { member: GuildMember; reason: string[] }
+    ) {
         try {
             if (
                 !member.roles.cache.find((r) => r.id === '785839177022963731')
@@ -452,7 +478,9 @@ export class UnmuteCommand extends AdminCommand {
             return msg.say(`Failed to unmute member: ${err.message}`);
         }
         return msg.say(
-            `Successfully unmuted <@${member.user.id}> for ${reason}`
+            `Successfully unmuted <@${member.user.id}> ${
+                reason.join(' ') ? 'for' : ''
+            } ${reason.join('') ? reason.join(' ') : ''}`
         );
     }
 }
@@ -521,16 +549,6 @@ export class RandomMentionCommand extends AdminCommand {
     }
 }
 
-function getReason(msg: CommandoMessage, shiftAmount?: number) {
-    const contentArr = msg.content.split(' ').filter((e) => e);
-    shiftAmount = shiftAmount || 2;
-    let i = 0;
-    while (i < shiftAmount) {
-        contentArr.shift();
-        i++;
-    }
-    return contentArr.join(' ');
-}
 function parseDuration(
     duration: string
 ): { durationValue: number; timeUnit: string } {
