@@ -378,8 +378,8 @@ export class ReadFileCommand extends Command {
         if (!attachment)
             return msg.say('Please attach a file to use this command');
         const extension = attachment.name.match(/\w+(?<=\.\w+)$/i)[0] ?? '';
-        if (attachment.size > 4096)
-            return msg.say('Error: Cannot read file larger than 4KB');
+        if (attachment.size > 8192)
+            return msg.say('Error: Cannot read file larger than 8KB');
 
         //download file from discord
         get(attachment.url, (res) => {
@@ -397,9 +397,29 @@ export class ReadFileCommand extends Command {
                 if (sentMsg.length < 2000) {
                     msg.say(sentMsg);
                 } else {
-                    msg.say('Error: File content too large to be sent');
+                    let msgArr = chunkStr(content, 1950);
+                    msgArr.forEach((m) =>
+                        msg.say(`\`\`\`${extension}\n${m}\n\`\`\``)
+                    );
                 }
             });
         });
     }
+}
+
+function chunkStr(str: string, chunkSize: number): string[] {
+    let retArr: string[] = [];
+    str = str.replace(/\r/g, '');
+    const lines = str.split('\n');
+    let tmpChunk = '';
+    for (const line of lines) {
+        if ((tmpChunk + line).length <= chunkSize) {
+            tmpChunk += '\n' + line;
+        } else {
+            retArr.push(tmpChunk);
+            tmpChunk = line;
+        }
+    }
+    retArr.push(tmpChunk);
+    return retArr;
 }
